@@ -32,7 +32,7 @@ func (c *nsqliteConnector) Connect(_ context.Context) (driver.Conn, error) {
 	return &Conn{client: c.httpClient}, nil
 }
 
-// Driver returns the underlying Driver of the Connector
+// Driver returns the underlying Driver of the Connector.
 func (c *nsqliteConnector) Driver() driver.Driver {
 	return &Driver{}
 }

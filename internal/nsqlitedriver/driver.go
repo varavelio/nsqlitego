@@ -28,7 +28,7 @@ func getNSQLiteHTTPClient(connectionString string) (*nsqlitehttp.Client, error) 
 	httpClientOnce.Do(func() {
 		hc, err := nsqlitehttp.NewClient(connectionString)
 		if err != nil {
-			httpClientErr = fmt.Errorf("failed to create NSQLite HTTP client: %v", err)
+			httpClientErr = fmt.Errorf("failed to create NSQLite HTTP client: %w", err)
 			return
 		}
 
@@ -43,7 +43,7 @@ func getNSQLiteHTTPClient(connectionString string) (*nsqlitehttp.Client, error) 
 func (d *Driver) Open(connectionString string) (driver.Conn, error) {
 	httpClient, err := getNSQLiteHTTPClient(connectionString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create NSQLite HTTP client: %v", err)
+		return nil, fmt.Errorf("failed to create NSQLite HTTP client: %w", err)
 	}
 
 	connector := NewConnector(httpClient)
@@ -54,7 +54,7 @@ func (d *Driver) Open(connectionString string) (driver.Conn, error) {
 func (d *Driver) OpenConnector(connectionString string) (driver.Connector, error) {
 	httpClient, err := getNSQLiteHTTPClient(connectionString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create NSQLite HTTP client: %v", err)
+		return nil, fmt.Errorf("failed to create NSQLite HTTP client: %w", err)
 	}
 
 	return NewConnector(httpClient), nil

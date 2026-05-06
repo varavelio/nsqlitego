@@ -51,7 +51,7 @@ func WithHTTPClient(httpClient *http.Client) ClientOption {
 func NewClient(connectionString string, options ...ClientOption) (*Client, error) {
 	connStr, err := nsqlitedsn.NewConnStrFromText(connectionString)
 	if err != nil {
-		return nil, fmt.Errorf("invalid connection string: %v", err)
+		return nil, fmt.Errorf("invalid connection string: %w", err)
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
@@ -77,7 +77,7 @@ func NewClient(connectionString string, options ...ClientOption) (*Client, error
 	return client, nil
 }
 
-// newRequest creates a new HTTP request with the NSQLite URL and authentication
+// newRequest creates a new HTTP request with the NSQLite URL and authentication.
 func (c *Client) newRequest(
 	ctx context.Context,
 	method, path string,
@@ -113,7 +113,7 @@ func (c *Client) SendPing(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != http.StatusOK {
 		return fmt.Errorf("unwanted response status %s", response.Status)
@@ -154,7 +154,7 @@ func (c *Client) GetVersion(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
 		return "", fmt.Errorf("authentication failed, please check your credentials")
@@ -272,7 +272,7 @@ func (c *Client) SendQueries(ctx context.Context, queries []Query) ([]QueryRespo
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
 		return nil, fmt.Errorf("authentication failed, please check your credentials")
@@ -374,7 +374,7 @@ func (c *Client) GetStats(ctx context.Context) (Stats, error) {
 	if err != nil {
 		return Stats{}, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
 		return Stats{}, fmt.Errorf("authentication failed, please check your credentials")

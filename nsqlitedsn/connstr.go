@@ -37,7 +37,7 @@ func (c *ConnStr) setDefaultsIfEmpty() {
 	}
 }
 
-// NewConnStrFromStr creates a new ConnStr from a connection string.
+// NewConnStrFromText creates a new ConnStr from a connection string.
 //
 // The connection string must be in the format
 // "protocol://host:port?authToken=token".
