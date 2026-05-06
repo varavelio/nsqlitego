@@ -54,7 +54,14 @@ func NewClient(connectionString string, options ...ClientOption) (*Client, error
 		return nil, fmt.Errorf("invalid connection string: %w", err)
 	}
 
-	transport := http.DefaultTransport.(*http.Transport).Clone()
+	var transport *http.Transport
+	if defaultTransport, ok := http.DefaultTransport.(*http.Transport); ok {
+		transport = defaultTransport.Clone()
+	} else {
+		transport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+		}
+	}
 	transport.MaxIdleConns = 100
 	transport.MaxIdleConnsPerHost = 100
 
@@ -116,6 +123,7 @@ func (c *Client) SendPing(ctx context.Context) error {
 	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != http.StatusOK {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return fmt.Errorf("unwanted response status %s", response.Status)
 	}
 
@@ -157,10 +165,12 @@ func (c *Client) GetVersion(ctx context.Context) (string, error) {
 	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return "", fmt.Errorf("authentication failed, please check your credentials")
 	}
 
 	if response.StatusCode != http.StatusOK {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return "", fmt.Errorf("unwanted response status: %s", response.Status)
 	}
 
@@ -230,6 +240,9 @@ type QueryResponse struct {
 
 	// Rows is the list of rows returned by the read query.
 	//
+	// Note: Numeric values inside Rows will be of type json.Number to prevent precision loss.
+	// You can convert them using val.(json.Number).Int64() or val.(json.Number).Float64().
+	//
 	//	- Included in "Type=read" responses.
 	//	- Included in "Type=write" responses if there are rows in the response.
 	Rows [][]any `json:"rows,omitempty"`
@@ -258,12 +271,12 @@ type Query struct {
 
 // SendQueries sends one or more queries to the remote server and returns the responses in same order.
 func (c *Client) SendQueries(ctx context.Context, queries []Query) ([]QueryResponse, error) {
-	requestBody, err := json.Marshal(queries)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(queries); err != nil {
+		return nil, fmt.Errorf("failed to encode request body: %w", err)
 	}
 
-	request, err := c.newRequest(ctx, http.MethodPost, "/query", bytes.NewReader(requestBody))
+	request, err := c.newRequest(ctx, http.MethodPost, "/query", &buf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -275,10 +288,12 @@ func (c *Client) SendQueries(ctx context.Context, queries []Query) ([]QueryRespo
 	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return nil, fmt.Errorf("authentication failed, please check your credentials")
 	}
 
 	if response.StatusCode != http.StatusOK {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return nil, fmt.Errorf("unwanted response status: %s", response.Status)
 	}
 
@@ -377,10 +392,12 @@ func (c *Client) GetStats(ctx context.Context) (Stats, error) {
 	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode == http.StatusUnauthorized {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return Stats{}, fmt.Errorf("authentication failed, please check your credentials")
 	}
 
 	if response.StatusCode != http.StatusOK {
+		_, _ = io.Copy(io.Discard, response.Body)
 		return Stats{}, fmt.Errorf("unwanted response status: %s", response.Status)
 	}
 
