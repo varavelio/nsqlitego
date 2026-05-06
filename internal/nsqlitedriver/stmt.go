@@ -3,11 +3,11 @@ package nsqlitedriver
 import (
 	"context"
 	"database/sql/driver"
-	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/goccy/go-json"
 	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
