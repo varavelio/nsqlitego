@@ -25,15 +25,21 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://varavel.com">
+    <img src="https://cdn.jsdelivr.net/gh/varavelio/brand@1.0.0/dist/badges/project.svg" alt="A Varavel project"/>
+  </a>
+</p>
+
 # nsqlitego
 
 NSQLite Go Driver, a driver for the
-[**NSQLite database engine**](https://github.com/varavelio/nsqlite) — compatible
+[**NSQLite database engine**](https://github.com/varavelio/nsqlite) compatible
 with the standard [`database/sql`](https://pkg.go.dev/database/sql) package.
 
 ## Features
 
-- Communicates with the **NSQLite database engine** over HTTP/HTTPS.
+- Communicates with **NSQLite** over HTTP/HTTPS.
 - Implements `database/sql/driver` interfaces for seamless integration.
 - Supports transactions, prepared statements, and custom DSN parsing.
 - Zero dependencies outside the standard library.
