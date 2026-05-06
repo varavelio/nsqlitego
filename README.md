@@ -1,6 +1,6 @@
 <p align="center">
   <p align="center">
-    <img align="center" width="300" src="https://raw.githubusercontent.com/nsqlite/nsqlite/main/assets/NSQLite.png"/>
+    <img align="center" width="300" src="https://raw.githubusercontent.com/varavelio/nsqlite/main/assets/NSQLite.png"/>
   </p>
   <p align="center">
     SQLite Over The Network
@@ -11,24 +11,24 @@
   <a href="https://pkg.go.dev/github.com/varavelio/nsqlitego">
     <img src="https://pkg.go.dev/badge/github.com/varavelio/nsqlitego" alt="Go Reference"/>
   </a>
-  <a href="https://goreportcard.com/report/nsqlite/nsqlitego">
-    <img src="https://goreportcard.com/badge/nsqlite/nsqlitego" alt="Go Report Card"/>
+  <a href="https://goreportcard.com/report/varavelio/nsqlitego">
+    <img src="https://goreportcard.com/badge/varavelio/nsqlitego" alt="Go Report Card"/>
   </a>
   <a href="https://github.com/varavelio/nsqlitego/releases/latest">
-    <img src="https://img.shields.io/github/release/nsqlite/nsqlitego.svg" alt="Release Version"/>
+    <img src="https://img.shields.io/github/release/varavelio/nsqlitego.svg" alt="Release Version"/>
   </a>
   <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/nsqlite/nsqlitego.svg" alt="License"/>
+    <img src="https://img.shields.io/github/license/varavelio/nsqlitego.svg" alt="License"/>
   </a>
   <a href="https://github.com/varavelio/nsqlitego">
-    <img src="https://img.shields.io/github/stars/nsqlite/nsqlitego?style=flat&label=github+stars"/>
+    <img src="https://img.shields.io/github/stars/varavelio/nsqlitego?style=flat&label=github+stars"/>
   </a>
 </p>
 
 # nsqlitego
 
 NSQLite Go Driver, a driver for the
-[**NSQLite database engine**](https://github.com/nsqlite/nsqlite) — compatible
+[**NSQLite database engine**](https://github.com/varavelio/nsqlite) — compatible
 with the standard [`database/sql`](https://pkg.go.dev/database/sql) package.
 
 ## Features
