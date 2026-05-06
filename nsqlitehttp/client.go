@@ -78,7 +78,11 @@ func NewClient(connectionString string, options ...ClientOption) (*Client, error
 }
 
 // newRequest creates a new HTTP request with the NSQLite URL and authentication
-func (c *Client) newRequest(ctx context.Context, method string, path string, body io.Reader) (*http.Request, error) {
+func (c *Client) newRequest(
+	ctx context.Context,
+	method, path string,
+	body io.Reader,
+) (*http.Request, error) {
 	url, err := c.connStr.CreateUrlStr(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create URL: %w", err)

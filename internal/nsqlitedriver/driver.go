@@ -15,8 +15,7 @@ var (
 )
 
 // Driver implements database/sql/driver.Driver for NSQLite.
-type Driver struct {
-}
+type Driver struct{}
 
 var (
 	httpClient     *nsqlitehttp.Client
