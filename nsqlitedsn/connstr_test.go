@@ -143,7 +143,7 @@ func TestConnStr(t *testing.T) {
 					Port:      "8080",
 					AuthToken: "secret",
 				},
-				expected: "http://localhost:8080?authToken=****",
+				expected: "http://localhost:8080?authToken=***REDACTED***",
 			},
 			{
 				name:     "Empty ConnStr uses defaults without authToken",
@@ -155,7 +155,7 @@ func TestConnStr(t *testing.T) {
 				connStr: ConnStr{
 					AuthToken: "token",
 				},
-				expected: "http://localhost:9876?authToken=****",
+				expected: "http://localhost:9876?authToken=***REDACTED***",
 			},
 			{
 				name: "Partial fields set without authToken",
@@ -172,7 +172,7 @@ func TestConnStr(t *testing.T) {
 					Host:      "example.com",
 					AuthToken: "abc123",
 				},
-				expected: "https://example.com:9876?authToken=****",
+				expected: "https://example.com:9876?authToken=***REDACTED***",
 			},
 		}
 

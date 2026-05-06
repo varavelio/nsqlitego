@@ -87,7 +87,7 @@ func (c *ConnStr) String() string {
 		return c.Protocol + "://" + c.Host + ":" + c.Port
 	}
 
-	return c.Protocol + "://" + c.Host + ":" + c.Port + "?authToken=****"
+	return c.Protocol + "://" + c.Host + ":" + c.Port + "?authToken=***REDACTED***"
 }
 
 // BaseUrlStr returns the full URL of the connection string without the auth
