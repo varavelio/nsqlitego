@@ -21,9 +21,9 @@ type ConnStr struct {
 	AuthToken string
 }
 
-// setDefaultsIfEmpty sets the default values for the connection string if they
-// are empty.
-func (c *ConnStr) setDefaultsIfEmpty() {
+// withDefaults returns a copy of the ConnStr with default values applied for
+// any empty fields. The original is not modified.
+func (c ConnStr) withDefaults() ConnStr {
 	if c.Protocol == "" {
 		c.Protocol = "http"
 	}
@@ -35,6 +35,8 @@ func (c *ConnStr) setDefaultsIfEmpty() {
 	if c.Port == "" {
 		c.Port = "9876"
 	}
+
+	return c
 }
 
 // NewConnStrFromText creates a new ConnStr from a connection string.
@@ -81,20 +83,20 @@ func NewConnStrFromText(connStrText string) (*ConnStr, error) {
 // String returns the string representation of the connection string without
 // the auth token.
 func (c *ConnStr) String() string {
-	c.setDefaultsIfEmpty()
+	safeC := c.withDefaults()
 
-	if c.AuthToken == "" {
-		return c.Protocol + "://" + c.Host + ":" + c.Port
+	if safeC.AuthToken == "" {
+		return safeC.Protocol + "://" + safeC.Host + ":" + safeC.Port
 	}
 
-	return c.Protocol + "://" + c.Host + ":" + c.Port + "?authToken=***REDACTED***"
+	return safeC.Protocol + "://" + safeC.Host + ":" + safeC.Port + "?authToken=***REDACTED***"
 }
 
 // BaseUrlStr returns the full URL of the connection string without the auth
 // token.
 func (c *ConnStr) BaseUrlStr() string {
-	c.setDefaultsIfEmpty()
-	return c.Protocol + "://" + c.Host + ":" + c.Port
+	safeC := c.withDefaults()
+	return safeC.Protocol + "://" + safeC.Host + ":" + safeC.Port
 }
 
 // CreateUrlStr returns a string URL from the connection string and the
@@ -102,16 +104,16 @@ func (c *ConnStr) BaseUrlStr() string {
 //
 // This does not include the auth token in the URL.
 func (c *ConnStr) CreateUrlStr(path string) (string, error) {
-	c.setDefaultsIfEmpty()
+	safeC := c.withDefaults()
 
-	parts := strings.Split(path, "?")
+	parts := strings.SplitN(path, "?", 2)
 	query := ""
 	if len(parts) > 1 {
 		path = parts[0]
 		query = parts[1]
 	}
 
-	joined, err := url.JoinPath(c.BaseUrlStr(), path)
+	joined, err := url.JoinPath(safeC.BaseUrlStr(), path)
 	if err != nil {
 		return "", fmt.Errorf("failed to join URL path: %w", err)
 	}
@@ -128,9 +130,9 @@ func (c *ConnStr) CreateUrlStr(path string) (string, error) {
 //
 // This does not include the auth token in the URL.
 func (c *ConnStr) CreateUrl(path string) (*url.URL, error) {
-	c.setDefaultsIfEmpty()
+	safeC := c.withDefaults()
 
-	joined, err := c.CreateUrlStr(path)
+	joined, err := safeC.CreateUrlStr(path)
 	if err != nil {
 		return nil, err
 	}

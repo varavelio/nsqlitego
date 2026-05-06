@@ -429,41 +429,38 @@ func TestConnStr(t *testing.T) {
 		}
 	})
 
-	t.Run("setDefaultsIfEmpty", func(t *testing.T) {
+	t.Run("Read methods do not mutate original struct", func(t *testing.T) {
 		tests := []struct {
 			name        string
 			initial     ConnStr
-			expected    ConnStr
 			methodToUse string // "String", "BaseUrlStr", "CreateUrlStr", "CreateUrl"
 		}{
 			{
-				name:        "Empty ConnStr defaults via String",
+				name:        "Empty ConnStr via String",
 				initial:     ConnStr{},
-				expected:    ConnStr{Protocol: "http", Host: "localhost", Port: "9876"},
 				methodToUse: "String",
 			},
 			{
-				name:        "Partial ConnStr defaults via BaseUrlStr",
+				name:        "Partial ConnStr via BaseUrlStr",
 				initial:     ConnStr{Protocol: "https"},
-				expected:    ConnStr{Protocol: "https", Host: "localhost", Port: "9876"},
 				methodToUse: "BaseUrlStr",
 			},
 			{
-				name:        "Partial ConnStr defaults via CreateUrlStr",
+				name:        "Partial ConnStr via CreateUrlStr",
 				initial:     ConnStr{Host: "example.com"},
-				expected:    ConnStr{Protocol: "http", Host: "example.com", Port: "9876"},
 				methodToUse: "CreateUrlStr",
 			},
 			{
-				name:        "Partial ConnStr defaults via CreateUrl",
+				name:        "Partial ConnStr via CreateUrl",
 				initial:     ConnStr{Port: "8000"},
-				expected:    ConnStr{Protocol: "http", Host: "localhost", Port: "8000"},
 				methodToUse: "CreateUrl",
 			},
 		}
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
+				original := tt.initial
+
 				switch tt.methodToUse {
 				case "String":
 					_ = tt.initial.String()
@@ -475,22 +472,22 @@ func TestConnStr(t *testing.T) {
 					_, _ = tt.initial.CreateUrl("testpath")
 				}
 
-				if tt.initial.Protocol != tt.expected.Protocol {
+				if original.Protocol != tt.initial.Protocol {
 					t.Errorf(
-						"expected Protocol: %s, got: %s",
-						tt.expected.Protocol, tt.initial.Protocol,
+						"Protocol was mutated: was %q, now %q",
+						original.Protocol, tt.initial.Protocol,
 					)
 				}
-				if tt.initial.Host != tt.expected.Host {
+				if original.Host != tt.initial.Host {
 					t.Errorf(
-						"expected Host: %s, got: %s",
-						tt.expected.Host, tt.initial.Host,
+						"Host was mutated: was %q, now %q",
+						original.Host, tt.initial.Host,
 					)
 				}
-				if tt.initial.Port != tt.expected.Port {
+				if original.Port != tt.initial.Port {
 					t.Errorf(
-						"expected Port: %s, got: %s",
-						tt.expected.Port, tt.initial.Port,
+						"Port was mutated: was %q, now %q",
+						original.Port, tt.initial.Port,
 					)
 				}
 			})
