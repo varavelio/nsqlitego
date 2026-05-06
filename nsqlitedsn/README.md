@@ -1,7 +1,7 @@
 # nsqlitedsn
 
-<a href="https://pkg.go.dev/github.com/nsqlite/nsqlitego/nsqlitedsn">
-  <img src="https://pkg.go.dev/badge/github.com/nsqlite/nsqlitego/nsqlitedsn" alt="Go Reference"/>
+<a href="https://pkg.go.dev/github.com/varavelio/nsqlitego/nsqlitedsn">
+  <img src="https://pkg.go.dev/badge/github.com/varavelio/nsqlitego/nsqlitedsn" alt="Go Reference"/>
 </a>
 
 A lightweight utility package for parsing and manipulating **NSQLite**
@@ -17,15 +17,15 @@ connection strings.
 ## Installation
 
 ```bash
-go get github.com/nsqlite/nsqlitego
+go get github.com/varavelio/nsqlitego
 ```
 
 > **Note**: This package comes bundled with
-> [`nsqlitego`](https://github.com/nsqlite/nsqlitego).\
+> [`nsqlitego`](https://github.com/varavelio/nsqlitego).\
 > Import it as follows:
 >
 > ```go
-> import "github.com/nsqlite/nsqlitego/nsqlitedsn"
+> import "github.com/varavelio/nsqlitego/nsqlitedsn"
 > ```
 
 ## Usage

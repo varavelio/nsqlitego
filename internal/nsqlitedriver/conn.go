@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/nsqlite/nsqlitego/nsqlitehttp"
+	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
 var (

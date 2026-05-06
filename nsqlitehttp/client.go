@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nsqlite/nsqlitego/nsqlitedsn"
+	"github.com/varavelio/nsqlitego/nsqlitedsn"
 )
 
 // Client is an HTTP client for the NSQLite server.

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql/driver"
 
-	"github.com/nsqlite/nsqlitego/nsqlitehttp"
+	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
 var _ driver.Connector = (*nsqliteConnector)(nil)

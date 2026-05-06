@@ -1,7 +1,7 @@
 # nsqlitehttp
 
-<a href="https://pkg.go.dev/github.com/nsqlite/nsqlitego/nsqlitehttp">
-  <img src="https://pkg.go.dev/badge/github.com/nsqlite/nsqlitego/nsqlitehttp" alt="Go Reference"/>
+<a href="https://pkg.go.dev/github.com/varavelio/nsqlitego/nsqlitehttp">
+  <img src="https://pkg.go.dev/badge/github.com/varavelio/nsqlitego/nsqlitehttp" alt="Go Reference"/>
 </a>
 
 An HTTP client package for directly interacting with the **NSQLite database
@@ -9,7 +9,7 @@ engine** over HTTP/HTTPS.
 
 Use this if you want a lower-level approach than the
 [`database/sql`](https://pkg.go.dev/database/sql) interface provided by
-[`nsqlitego`](https://github.com/nsqlite/nsqlitego).
+[`nsqlitego`](https://github.com/varavelio/nsqlitego).
 
 ## Features
 
@@ -21,15 +21,15 @@ Use this if you want a lower-level approach than the
 ## Installation
 
 ```bash
-go get github.com/nsqlite/nsqlitego
+go get github.com/varavelio/nsqlitego
 ```
 
 > **Note**: This package is part of the
-> [`nsqlitego`](https://github.com/nsqlite/nsqlitego) repository.\
+> [`nsqlitego`](https://github.com/varavelio/nsqlitego) repository.\
 > Import it as:
 >
 > ```go
-> import "github.com/nsqlite/nsqlitego/nsqlitehttp"
+> import "github.com/varavelio/nsqlitego/nsqlitehttp"
 > ```
 
 ## Usage
@@ -77,5 +77,5 @@ if err := client.SendPing(context.TODO()); err != nil {
 ### Advanced Usage
 
 Please refer to the
-[nsqlitehttp Go Reference](https://pkg.go.dev/github.com/nsqlite/nsqlitego/nsqlitehttp)
+[nsqlitehttp Go Reference](https://pkg.go.dev/github.com/varavelio/nsqlitego/nsqlitehttp)
 for more details.

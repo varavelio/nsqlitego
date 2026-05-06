@@ -6,8 +6,8 @@ import (
 	"database/sql"
 	"database/sql/driver"
 
-	"github.com/nsqlite/nsqlitego/internal/nsqlitedriver"
-	"github.com/nsqlite/nsqlitego/nsqlitehttp"
+	"github.com/varavelio/nsqlitego/internal/nsqlitedriver"
+	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
 // init registers the NSQLite driver for database/sql.

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nsqlite/nsqlitego/nsqlitehttp"
+	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
 func TestConvertNamedValueToQueryParam(t *testing.T) {

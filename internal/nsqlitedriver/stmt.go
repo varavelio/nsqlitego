@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/nsqlite/nsqlitego/nsqlitehttp"
+	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
 var (

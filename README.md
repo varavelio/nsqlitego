@@ -8,19 +8,19 @@
 </p>
 
 <p align="center">
-  <a href="https://pkg.go.dev/github.com/nsqlite/nsqlitego">
-    <img src="https://pkg.go.dev/badge/github.com/nsqlite/nsqlitego" alt="Go Reference"/>
+  <a href="https://pkg.go.dev/github.com/varavelio/nsqlitego">
+    <img src="https://pkg.go.dev/badge/github.com/varavelio/nsqlitego" alt="Go Reference"/>
   </a>
   <a href="https://goreportcard.com/report/nsqlite/nsqlitego">
     <img src="https://goreportcard.com/badge/nsqlite/nsqlitego" alt="Go Report Card"/>
   </a>
-  <a href="https://github.com/nsqlite/nsqlitego/releases/latest">
+  <a href="https://github.com/varavelio/nsqlitego/releases/latest">
     <img src="https://img.shields.io/github/release/nsqlite/nsqlitego.svg" alt="Release Version"/>
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/github/license/nsqlite/nsqlitego.svg" alt="License"/>
   </a>
-  <a href="https://github.com/nsqlite/nsqlitego">
+  <a href="https://github.com/varavelio/nsqlitego">
     <img src="https://img.shields.io/github/stars/nsqlite/nsqlitego?style=flat&label=github+stars"/>
   </a>
 </p>
@@ -41,7 +41,7 @@ with the standard [`database/sql`](https://pkg.go.dev/database/sql) package.
 ## Installation
 
 ```bash
-go get github.com/nsqlite/nsqlitego
+go get github.com/varavelio/nsqlitego
 ```
 
 Ensure that you are using Go modules (`go mod init`) in your project.
@@ -57,7 +57,7 @@ query:
 import (
   "database/sql"
   "fmt"
-  _ "github.com/nsqlite/nsqlitego"
+  _ "github.com/varavelio/nsqlitego"
 )
 
 func main() {
