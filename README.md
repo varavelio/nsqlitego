@@ -114,6 +114,22 @@ if err := tx.Commit(); err != nil {
 
 Errors are ignored for brevity, but you should always handle them in your code.
 
+> **⚠️ Important: Transactions are blocking**
+>
+> NSQLite delegates transactions to SQLite, which uses **database-level locking**
+> during writes. This means only one write transaction can be active at a time;
+> all other write operations will queue behind it.
+>
+> To avoid performance degradation and timeouts:
+>
+> - **Keep transactions short**. Do not perform heavy processing (e.g., complex
+>   computations, external API calls, or large data transformations) while a
+>   transaction is open.
+> - **Batch your work in a single round-trip**. Prepare all the data you need
+>   beforehand and execute the transaction as a single, fast unit of work.
+> - **Long-running transactions block the entire database**, affecting all
+>   concurrent writers.
+
 ## Additional Packages
 
 These packages are included in this repository, so no additional installation is
