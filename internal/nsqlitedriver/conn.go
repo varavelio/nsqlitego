@@ -150,6 +150,10 @@ func (c *Conn) ResetSession(ctx context.Context) error {
 
 // IsValid is called prior to placing the connection into the connection pool.
 // The connection will be discarded if false is returned.
+//
+// Always returns true because the actual query will fail cleanly if the server
+// is unreachable, avoiding the overhead of a health check on every connection
+// reuse.
 func (c *Conn) IsValid() bool {
-	return c.client.IsHealthy(context.Background()) == nil
+	return true
 }

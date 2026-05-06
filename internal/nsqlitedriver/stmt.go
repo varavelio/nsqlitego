@@ -3,6 +3,7 @@ package nsqlitedriver
 import (
 	"context"
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -104,7 +105,17 @@ func (r *QueryRows) Next(dest []driver.Value) error {
 
 	row := r.rows[r.rowIdx]
 	for i, val := range row {
-		dest[i] = val
+		if num, ok := val.(json.Number); ok {
+			if i64, err := num.Int64(); err == nil {
+				dest[i] = i64
+			} else if f64, err := num.Float64(); err == nil {
+				dest[i] = f64
+			} else {
+				dest[i] = num.String()
+			}
+		} else {
+			dest[i] = val
+		}
 	}
 
 	r.rowIdx++
