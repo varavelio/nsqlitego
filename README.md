@@ -42,7 +42,6 @@ with the standard [`database/sql`](https://pkg.go.dev/database/sql) package.
 - Communicates with **NSQLite** over HTTP/HTTPS.
 - Implements `database/sql/driver` interfaces for seamless integration.
 - Supports transactions, prepared statements, and custom DSN parsing.
-- Zero dependencies outside the standard library.
 
 ## Installation
 

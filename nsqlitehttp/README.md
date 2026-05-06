@@ -16,7 +16,6 @@ Use this if you want a lower-level approach than the
 - Issue raw JSON-based requests to an NSQLite server.
 - Customizable headers, request methods, and endpoints.
 - Handle responses as JSON or plain text.
-- Zero dependencies outside the standard library.
 
 ## Installation
 
