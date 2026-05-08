@@ -20,6 +20,9 @@ linters:
     - durationcheck
     - makezero
     - noctx
+  exclusions:
+    paths:
+      - internal/vdl
 
 formatters:
   enable:
@@ -29,3 +32,6 @@ formatters:
   settings:
     gofumpt:
       extra-rules: true
+  exclusions:
+    paths:
+      - internal/vdl
