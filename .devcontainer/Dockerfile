@@ -4,6 +4,9 @@ WORKDIR /fetcher
 
 RUN \
   apk add --quiet curl unzip && \
+  # Fetch VDL
+  curl -fsSL https://get.varavel.com/vdl | VERSION=v0.5.0-alpha.5 INSTALL_DIR=/fetcher QUIET=true sh && \
+  chmod +x ./vdl && \
   # Fetch dprint
   curl -fsSL https://dprint.dev/install.sh | sh && \
   mv /root/.dprint/bin/dprint ./dprint && chmod +x ./dprint && \
@@ -18,6 +21,7 @@ FROM golang:1.26-trixie
 COPY --from=golangci/golangci-lint:v2.12.1 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
 
 # Install tools from the fetcher stage
+COPY --from=fetcher /fetcher/vdl /usr/local/bin/vdl
 COPY --from=fetcher /fetcher/dprint /usr/local/bin/dprint
 COPY --from=fetcher /fetcher/task /usr/local/bin/task
 
