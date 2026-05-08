@@ -1,0 +1,352 @@
+@rpc
+type Database {
+  """
+  Executes one or more SQL queries against the database.
+
+  Queries are executed in order and each query returns one result item.
+  Empty or failed queries are returned as result items with type "error".
+  """
+  @proc
+  query {
+    input {
+      """
+      The list of SQL queries to execute in order.
+      """
+      queries Query[]
+    }
+
+    output {
+      """
+      Total execution time in seconds for all queries.
+      """
+      time float
+
+      """
+      One result per input query, in the same order.
+      """
+      results QueryResult[]
+    }
+  }
+}
+
+type Query {
+  """
+  Transaction ID to execute the query within an existing transaction.
+  """
+  txId? string
+
+  """
+  The SQL query string.
+  """
+  query string
+
+  """
+  Optional query parameters.
+  """
+  params? QueryParam[]
+}
+
+type QueryParam {
+  """
+  Parameter name for named parameters. Omitted for positional parameters.
+  """
+  name? string
+
+  """
+  The parameter value.
+  """
+  value SqliteValue
+}
+
+type QueryResult {
+  """
+  The type of result (read, write, begin, commit, rollback, or error).
+  """
+  type QueryResultType
+
+  """
+  Query execution time in seconds (as a floating-point duration).
+  """
+  time float
+
+  """
+  Error message, present when type is "error".
+  """
+  error? string
+
+  """
+  Transaction ID, present when type is "begin".
+  """
+  txId? string
+
+  """
+  The rowid of the last inserted row, present for write results.
+  """
+  lastInsertId? int
+
+  """
+  The number of rows affected, present for write results.
+  """
+  rowsAffected? int
+
+  """
+  Column names for the returned rows, present for read/write results.
+  """
+  columns? string[]
+
+  """
+  Storage class of each column for the returned rows.
+  """
+  types? SqliteStorageClass[]
+
+  """
+  The returned rows, each row being an array of SqliteValue.
+  """
+  rows? SqliteValue[][]
+}
+
+type SqliteValue {
+  """
+  SQL NULL value.
+  """
+  null? bool
+
+  """
+  SQL INTEGER value.
+  """
+  integer? int
+
+  """
+  SQL REAL value.
+  """
+  real? float
+
+  """
+  SQL TEXT value.
+  """
+  text? string
+
+  """
+  SQL BLOB value encoded as base64.
+  """
+  blob? string
+}
+
+type Stats {
+  """
+  The server start time.
+  """
+  startedAt datetime
+
+  """
+  Number of seconds since the server started.
+  """
+  uptimeSeconds float
+
+  """
+  Cumulative counters for all completed operations.
+  """
+  totals StatsTotalsCounters
+
+  """
+  Counters for currently queued or in-flight operations.
+  """
+  queued StatsQueuedCounters
+
+  """
+  Per-minute counters keyed by UTC minute in RFC3339 format.
+  """
+  minutes map[StatsTotalsCounters]
+}
+
+type StatsQueuedCounters {
+  """
+  Number of BEGIN TRANSACTION statements currently queued.
+  """
+  begins int
+
+  """
+  Number of write queries currently queued.
+  """
+  writes int
+
+  """
+  Number of HTTP requests currently being processed or queued.
+  """
+  httpRequests int
+}
+
+type StatsTotalsCounters {
+  """
+  Total number of completed read queries.
+  """
+  reads int
+
+  """
+  Total number of completed write queries.
+  """
+  writes int
+
+  """
+  Total number of completed BEGIN TRANSACTION statements.
+  """
+  begins int
+
+  """
+  Total number of completed COMMIT statements.
+  """
+  commits int
+
+  """
+  Total number of completed ROLLBACK statements.
+  """
+  rollbacks int
+
+  """
+  Total number of queries that resulted in an error.
+  """
+  errors int
+
+  """
+  Total number of HTTP requests received.
+  """
+  httpRequests int
+}
+
+@rpc
+type System {
+  """
+  Checks whether the server can perform a basic database read.
+  """
+  @proc
+  health {
+    output {
+      """
+      Whether the server is healthy and fully operational.
+      """
+      healthy bool
+
+      """
+      Whether the database is reachable and responsive.
+      """
+      database bool
+
+      """
+      A human-readable message describing the health state.
+      """
+      message string
+    }
+  }
+
+  """
+  Returns the authentication role for the current session.
+  """
+  @proc
+  session {
+    output {
+      """
+      The authentication role assigned to the current session.
+      """
+      role AuthRole
+    }
+  }
+
+  """
+  Returns server information and runtime statistics.
+  """
+  @proc
+  status {
+    output {
+      """
+      The server name.
+      """
+      name string
+
+      """
+      The server version string.
+      """
+      version string
+
+      """
+      Current runtime statistics.
+      """
+      stats Stats
+    }
+  }
+}
+
+enum AuthRole {
+  """
+  Full administrative access.
+  """
+  Admin = "admin"
+
+  """
+  Read and write access to the database.
+  """
+  ReadWrite = "rw"
+
+  """
+  Read-only access to the database.
+  """
+  ReadOnly = "ro"
+}
+
+enum QueryResultType {
+  """
+  A read-only query (SELECT).
+  """
+  Read = "read"
+
+  """
+  A write query (INSERT, UPDATE, DELETE, CREATE, etc.).
+  """
+  Write = "write"
+
+  """
+  A BEGIN TRANSACTION query.
+  """
+  Begin = "begin"
+
+  """
+  A COMMIT TRANSACTION query.
+  """
+  Commit = "commit"
+
+  """
+  A ROLLBACK TRANSACTION query.
+  """
+  Rollback = "rollback"
+
+  """
+  An error result produced by an empty or failed query.
+  """
+  Error = "error"
+}
+
+enum SqliteStorageClass {
+  """
+  The SQL NULL value.
+  """
+  Null = "NULL"
+
+  """
+  A signed integer.
+  """
+  Integer = "INTEGER"
+
+  """
+  A floating-point value.
+  """
+  Real = "REAL"
+
+  """
+  A text string.
+  """
+  Text = "TEXT"
+
+  """
+  A binary blob.
+  """
+  Blob = "BLOB"
+}
