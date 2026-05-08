@@ -46,10 +46,10 @@ fmt.Println(connStr.AuthToken) // abc123
 ### Constructing URLs
 
 ```go
-urlStr, err := connStr.CreateUrlStr("/api/v1/query?param=demo")
+urlStr, err := connStr.CreateUrlStr("/rpc")
 if err != nil {
   panic(err)
 }
 fmt.Println(urlStr)
-// Output: https://example.com:9999/api/v1/query?param=demo
+// Output: https://example.com:9999/rpc
 ```
