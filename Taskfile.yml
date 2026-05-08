@@ -15,6 +15,10 @@ tasks:
     desc: Install dependencies
     cmd: go mod download
 
+  codegen:
+    desc: Generate code
+    cmd: vdl generate ./schema/vdl.config.vdl
+
   format:
     desc: Format all code
     cmds:
