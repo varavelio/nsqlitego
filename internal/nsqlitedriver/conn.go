@@ -72,14 +72,14 @@ func (c *Conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	if resp.Error != "" {
-		return nil, fmt.Errorf("failed to begin transaction: %s", resp.Error)
+	if resp.GetError() != "" {
+		return nil, fmt.Errorf("failed to begin transaction: %s", resp.GetError())
 	}
-	if resp.TxID == "" {
+	if resp.GetTxId() == "" {
 		return nil, fmt.Errorf("transaction ID not returned from server")
 	}
 
-	c.setTxId(resp.TxID)
+	c.setTxId(resp.GetTxId())
 	return &Tx{
 		conn: c,
 	}, nil
@@ -94,13 +94,13 @@ func (c *Conn) CommitTx(ctx context.Context) error {
 
 	resp, err := c.client.SendQuery(ctx, nsqlitehttp.Query{
 		Query: "COMMIT",
-		TxID:  c.txID,
+		TxId:  optionalString(c.txID),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
-	if resp.Error != "" {
-		return fmt.Errorf("failed to commit transaction: %s", resp.Error)
+	if resp.GetError() != "" {
+		return fmt.Errorf("failed to commit transaction: %s", resp.GetError())
 	}
 
 	return nil
@@ -115,13 +115,13 @@ func (c *Conn) RollbackTx(ctx context.Context) error {
 
 	resp, err := c.client.SendQuery(ctx, nsqlitehttp.Query{
 		Query: "ROLLBACK",
-		TxID:  c.txID,
+		TxId:  optionalString(c.txID),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to rollback transaction: %w", err)
 	}
-	if resp.Error != "" {
-		return fmt.Errorf("failed to rollback transaction: %s", resp.Error)
+	if resp.GetError() != "" {
+		return fmt.Errorf("failed to rollback transaction: %s", resp.GetError())
 	}
 
 	return nil

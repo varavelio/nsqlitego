@@ -3,11 +3,13 @@ package nsqlitedriver
 import (
 	"context"
 	"database/sql/driver"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
-	"github.com/goccy/go-json"
+	"github.com/varavelio/nsqlitego/internal/vdl"
 	"github.com/varavelio/nsqlitego/nsqlitehttp"
 )
 
@@ -55,21 +57,24 @@ func (r *ExecResult) RowsAffected() (int64, error) {
 
 // ExecContext executes a query without returning rows (e.g., INSERT, UPDATE).
 func (s *Stmt) ExecContext(ctx context.Context, args []driver.NamedValue) (driver.Result, error) {
-	params := convertNamedValueToQueryParam(args)
+	params, err := convertNamedValueToQueryParam(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert query params: %w", err)
+	}
 	resp, err := s.conn.client.SendQuery(ctx, nsqlitehttp.Query{
 		Query:  s.query,
-		Params: params,
-		TxID:   s.conn.txID,
+		Params: &params,
+		TxId:   optionalString(s.conn.txID),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
-	if resp.Error != "" {
-		return nil, fmt.Errorf("failed to execute query: %s", resp.Error)
+	if resp.GetError() != "" {
+		return nil, fmt.Errorf("failed to execute query: %s", resp.GetError())
 	}
 	return &ExecResult{
-		lastInsertId: resp.LastInsertID,
-		rowsAffected: resp.RowsAffected,
+		lastInsertId: resp.GetLastInsertId(),
+		rowsAffected: resp.GetRowsAffected(),
 	}, nil
 }
 
@@ -82,7 +87,7 @@ func (s *Stmt) Exec(args []driver.Value) (driver.Result, error) {
 type QueryRows struct {
 	columns []string
 	types   []string
-	rows    [][]any
+	rows    [][]nsqlitehttp.SqliteValue
 	rowsLen int
 	rowIdx  int
 }
@@ -105,17 +110,7 @@ func (r *QueryRows) Next(dest []driver.Value) error {
 
 	row := r.rows[r.rowIdx]
 	for i, val := range row {
-		if num, ok := val.(json.Number); ok {
-			if i64, err := num.Int64(); err == nil {
-				dest[i] = i64
-			} else if f64, err := num.Float64(); err == nil {
-				dest[i] = f64
-			} else {
-				dest[i] = num.String()
-			}
-		} else {
-			dest[i] = val
-		}
+		dest[i] = sqliteValueToDriverValue(val)
 	}
 
 	r.rowIdx++
@@ -135,23 +130,31 @@ func (r *QueryRows) ColumnTypeDatabaseTypeName(index int) string {
 
 // QueryContext executes a query that returns rows (e.g., SELECT).
 func (s *Stmt) QueryContext(ctx context.Context, args []driver.NamedValue) (driver.Rows, error) {
-	params := convertNamedValueToQueryParam(args)
+	params, err := convertNamedValueToQueryParam(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert query params: %w", err)
+	}
 	resp, err := s.conn.client.SendQuery(ctx, nsqlitehttp.Query{
 		Query:  s.query,
-		Params: params,
-		TxID:   s.conn.txID,
+		Params: &params,
+		TxId:   optionalString(s.conn.txID),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
-	if resp.Error != "" {
-		return nil, fmt.Errorf("failed to execute query: %s", resp.Error)
+	if resp.GetError() != "" {
+		return nil, fmt.Errorf("failed to execute query: %s", resp.GetError())
+	}
+	types := resp.GetTypes()
+	columnTypes := make([]string, len(types))
+	for i, value := range types {
+		columnTypes[i] = value.String()
 	}
 	return &QueryRows{
-		columns: resp.Columns,
-		types:   resp.Types,
-		rows:    resp.Rows,
-		rowsLen: len(resp.Rows),
+		columns: resp.GetColumns(),
+		types:   columnTypes,
+		rows:    resp.GetRows(),
+		rowsLen: len(resp.GetRows()),
 		rowIdx:  0,
 	}, nil
 }
@@ -162,15 +165,91 @@ func (s *Stmt) Query(args []driver.Value) (driver.Rows, error) {
 }
 
 // convertNamedValueToQueryParam converts driver.NamedValue arguments to []nsqlitehttp.QueryParam.
-func convertNamedValueToQueryParam(args []driver.NamedValue) []nsqlitehttp.QueryParam {
+func convertNamedValueToQueryParam(args []driver.NamedValue) ([]nsqlitehttp.QueryParam, error) {
 	converted := make([]nsqlitehttp.QueryParam, len(args))
 	for i, arg := range args {
+		value, err := driverValueToSqliteValue(arg.Value)
+		if err != nil {
+			return nil, fmt.Errorf("arg %d: %w", i, err)
+		}
 		converted[i] = nsqlitehttp.QueryParam{
-			Name:  arg.Name,
-			Value: arg.Value,
+			Name:  optionalString(arg.Name),
+			Value: value,
 		}
 	}
-	return converted
+	return converted, nil
+}
+
+func driverValueToSqliteValue(value any) (nsqlitehttp.SqliteValue, error) {
+	switch typed := value.(type) {
+	case nil:
+		return nsqlitehttp.SqliteValue{Null: vdl.Ptr(true)}, nil
+	case bool:
+		if typed {
+			return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(1))}, nil
+		}
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(0))}, nil
+	case int:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case int8:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case int16:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case int32:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case int64:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(typed)}, nil
+	case uint:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case uint8:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case uint16:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case uint32:
+		return nsqlitehttp.SqliteValue{Integer: vdl.Ptr(int64(typed))}, nil
+	case float32:
+		return nsqlitehttp.SqliteValue{Real: vdl.Ptr(float64(typed))}, nil
+	case float64:
+		return nsqlitehttp.SqliteValue{Real: vdl.Ptr(typed)}, nil
+	case string:
+		return nsqlitehttp.SqliteValue{Text: vdl.Ptr(typed)}, nil
+	case []byte:
+		encoded := base64.StdEncoding.EncodeToString(typed)
+		return nsqlitehttp.SqliteValue{Blob: vdl.Ptr(encoded)}, nil
+	case time.Time:
+		formatted := typed.UTC().Format(time.RFC3339Nano)
+		return nsqlitehttp.SqliteValue{Text: vdl.Ptr(formatted)}, nil
+	default:
+		return nsqlitehttp.SqliteValue{}, fmt.Errorf("unsupported value type %T", value)
+	}
+}
+
+func sqliteValueToDriverValue(value nsqlitehttp.SqliteValue) driver.Value {
+	switch {
+	case value.Null != nil && *value.Null:
+		return nil
+	case value.Integer != nil:
+		return *value.Integer
+	case value.Real != nil:
+		return *value.Real
+	case value.Text != nil:
+		return *value.Text
+	case value.Blob != nil:
+		decoded, err := base64.StdEncoding.DecodeString(*value.Blob)
+		if err == nil {
+			return decoded
+		}
+		return *value.Blob
+	default:
+		return nil
+	}
+}
+
+func optionalString(value string) *string {
+	if value == "" {
+		return nil
+	}
+	return vdl.Ptr(value)
 }
 
 // convertValueToNamedValue converts driver.Value arguments to
